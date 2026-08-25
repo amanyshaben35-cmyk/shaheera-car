@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>شهيرة كار | تأجير سيارات فاخرة</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="nav"><div class="brand">شهيرة <span>كار</span></div><nav>
+<a href="#home">الرئيسية</a><a href="#services">خدماتنا</a><a href="#cars">السيارات</a><a href="#booking">احجز الآن</a><a href="#tracking">متابعة الحجز</a></nav></header>
+<section id="home" class="hero"><div class="hero-content"><p class="eyebrow">SHAHEERA CAR</p>
+<h1>فخامة تليق <span>بمشوارك</span></h1><p>تأجير سيارات فاخرة يوميًا وشهريًا وسنويًا، وخدمات الزفاف والشركات والمطار.</p>
+<a class="btn" href="#booking">احجز سيارتك</a></div></section>
+<section id="services" class="section"><p class="eyebrow">خدماتنا</p><h2>كل مشوار له اختياره</h2><div class="cards">
+<article><b>تأجير يومي</b><p>سيارتك الفاخرة ليوم أو أكثر.</p></article><article><b>تأجير شهري</b><p>حل عملي ومرن للاستخدام الطويل.</p></article>
+<article><b>تأجير سنوي</b><p>خدمة مميزة بعقد طويل المدى.</p></article><article><b>سيارات الزفاف</b><p>اختيار فاخر ليومك المميز.</p></article>
+<article><b>خدمات الشركات</b><p>حلول نقل احترافية للشركات.</p></article><article><b>المطار</b><p>استقبال وتوصيل من وإلى المطار.</p></article></div></section>
+<section id="cars" class="section dark"><p class="eyebrow">أسطولنا</p><h2>سيارات شهيرة كار</h2>
+<p class="muted">كل سيارة تعرض صورها وأسعارها المضافة من لوحة الإدارة.</p><div id="carsGrid" class="cars-grid"><div class="loading">جاري تحميل السيارات...</div></div></section>
+
+<section id="tracking" class="section tracking"><p class="eyebrow">متابعة الحجز</p><h2>تابع حجزك برقم الطلب</h2>
+<p>اكتب رقم الطلب الذي حصلت عليه بعد إرسال الحجز.</p>
+<div class="track-form"><input id="trackingCode" placeholder="مثال: SH-000001"><button class="btn" type="button" onclick="trackBooking()">متابعة</button></div>
+<div id="trackingResult"></div></section>
+
+<section id="booking" class="section booking"><p class="eyebrow">حجز</p><h2>اطلب حجزك</h2><p>لتأكيد الحجز يلزم دفع <strong>50%</strong> من إجمالي قيمة الحجز.</p>
+<form id="bookingForm" enctype="multipart/form-data">
+<input name="customer_name" placeholder="اسم العميل" required><input name="phone" placeholder="رقم الهاتف" required>
+<select name="car_id" id="carSelect" required><option value="">اختر السيارة</option></select>
+<select name="service" required><option value="">نوع الخدمة</option><option>تأجير يومي</option><option>تأجير شهري</option><option>تأجير سنوي</option><option>سيارة زفاف</option><option>خدمات شركات</option><option>استقبال/توصيل مطار</option></select>
+<input type="date" name="start_date" required><input type="date" name="end_date">
+<input name="total" id="total" type="number" min="0" step="0.01" placeholder="إجمالي قيمة الحجز بالجنيه" required>
+<select name="payment_method" required><option value="">اختر طريقة دفع العربون</option><option>InstaPay - 01121405008</option><option>Vodafone Cash - 01015117230</option></select>
+<div class="payment-box"><b>العربون المطلوب: 50%</b><p>InstaPay: <strong>01121405008</strong></p><p>Vodafone Cash: <strong>01015117230</strong></p><p>بعد التحويل ارفع صورة/ملف إثبات الدفع.</p></div>
+<label class="file-label">إثبات دفع العربون (صورة أو PDF)<input name="receipt" type="file" accept="image/*,.pdf" required></label>
+<textarea name="notes" placeholder="ملاحظات إضافية"></textarea>
+<button class="btn" type="submit">إرسال طلب الحجز</button></form><div id="bookingResult"></div></section>
+<footer>© 2026 شهيرة كار — واتساب: 01010970035</footer><script src="app.js"></script></body></html>

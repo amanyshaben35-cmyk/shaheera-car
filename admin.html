@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>شهيرة كار | لوحة الإدارة</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="nav"><div class="brand">شهيرة <span>كار</span> — الإدارة</div><a class="btn" href="index.html">الموقع</a></header>
+<main class="section">
+<p class="eyebrow">ADMIN</p><h1 class="admin-title">إدارة السيارات والأسعار والصور</h1>
+<form id="carForm" class="admin-form" enctype="multipart/form-data">
+<input type="hidden" id="carId">
+<input id="name" placeholder="اسم السيارة" required><input id="category" placeholder="الفئة">
+<label class="file-label">صور السيارة (حتى 3 صور)<input id="images" name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple></label>
+<div id="existingImages" class="existing-images"></div>
+<input id="daily" name="daily_price" type="number" min="0" placeholder="سعر اليوم">
+<input id="monthly" name="monthly_price" type="number" min="0" placeholder="سعر الشهر">
+<input id="yearly" name="yearly_price" type="number" min="0" placeholder="سعر السنة">
+<input id="wedding" name="wedding_price" type="number" min="0" placeholder="سعر الزفاف">
+<div><button class="btn" type="submit">حفظ السيارة والأسعار</button> <button class="btn secondary" type="button" onclick="resetForm()">جديد</button></div>
+</form>
+<h2>السيارات والأسعار</h2><div id="cars" class="admin-list"></div>
+<h2>الحجوزات وإثباتات الدفع</h2><div id="bookings" class="admin-list"></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+async function load(){
+ const cars=await (await fetch("/admin/api/cars")).json();
+ $("cars").innerHTML=cars.length?cars.map(c=>`<div class="admin-row">
+ <div><b>${c.name}</b><small>${c.category||""}</small><div class="thumbs">${(c.images||[]).map(i=>`<img src="${i.url}" alt="">`).join("")}</div></div>
+ <div>اليوم: ${c.daily_price??"—"} | الشهر: ${c.monthly_price??"—"} | السنة: ${c.yearly_price??"—"} | الزفاف: ${c.wedding_price??"—"} جنيه</div>
+ <div><button onclick='edit(${JSON.stringify(c)})'>تعديل</button> <button onclick='delCar(${c.id})'>حذف</button></div>
+ </div>`).join(""):"لا توجد سيارات بعد.";
+ const bookings=await (await fetch("/admin/api/bookings")).json();
+ $("bookings").innerHTML=bookings.length?bookings.map(b=>`<div class="admin-row booking-row">
+ <div><b>${b.booking_code||"#"+b.id}</b><small>${b.customer_name} — ${b.phone}</small><small>${b.car_name||"بدون سيارة"} | ${b.service||"—"}</small></div>
+ <div><b>العربون:</b> ${b.deposit||0} جنيه | <b>الدفع:</b> ${b.payment_method||"—"}<br>
+ ${b.receipt?`<a class="receipt-link" href="${b.receipt}" target="_blank">عرض إثبات الدفع</a>`:"لا يوجد إثبات دفع"}</div>
+ <div><select onchange="status(${b.id},this.value,'booking')"><option ${b.booking_status==="طلب جديد"?"selected":""}>طلب جديد</option><option ${b.booking_status==="في انتظار مراجعة العربون"?"selected":""}>في انتظار مراجعة العربون</option><option ${b.booking_status==="مؤكد"?"selected":""}>مؤكد</option><option ${b.booking_status==="مكتمل"?"selected":""}>مكتمل</option><option ${b.booking_status==="ملغي"?"selected":""}>ملغي</option></select>
+ <select onchange="status(${b.id},this.value,'payment')"><option ${b.payment_status==="بانتظار الدفع"?"selected":""}>بانتظار الدفع</option><option ${b.payment_status==="قيد المراجعة"?"selected":""}>قيد المراجعة</option><option ${b.payment_status==="تم دفع العربون"?"selected":""}>تم دفع العربون</option><option ${b.payment_status==="تم الدفع بالكامل"?"selected":""}>تم الدفع بالكامل</option></select></div>
+ </div>`).join(""):"لا توجد حجوزات بعد.";
+}
+function edit(c){
+ $("carId").value=c.id;$("name").value=c.name;$("category").value=c.category||"";
+ $("daily").value=c.daily_price??"";$("monthly").value=c.monthly_price??"";$("yearly").value=c.yearly_price??"";$("wedding").value=c.wedding_price??"";
+ $("existingImages").innerHTML=(c.images||[]).map(i=>`<span><img src="${i.url}"><button type="button" onclick="delImage(${i.id})">حذف</button></span>`).join("");
+ scrollTo(0,0);
+}
+function resetForm(){$("carForm").reset();$("carId").value="";$("existingImages").innerHTML=""}
+$("carForm").onsubmit=async e=>{
+ e.preventDefault();
+ const fd=new FormData();
+ fd.append("name",$("name").value);fd.append("category",$("category").value);
+ fd.append("daily_price",$("daily").value);fd.append("monthly_price",$("monthly").value);fd.append("yearly_price",$("yearly").value);fd.append("wedding_price",$("wedding").value);
+ [...$("images").files].slice(0,3).forEach(f=>fd.append("images",f));
+ const id=$("carId").value;
+ const out=await (await fetch(id?"/admin/api/cars/"+id:"/admin/api/cars",{method:id?"PUT":"POST",body:fd})).json();
+ if(!out.ok){alert(out.message||"حدث خطأ");return}
+ resetForm();load();
+};
+async function delCar(id){if(confirm("حذف السيارة وصورها؟")){await fetch("/admin/api/cars/"+id,{method:"DELETE"});load()}}
+async function delImage(id){if(confirm("حذف الصورة؟")){await fetch("/admin/api/car-images/"+id,{method:"DELETE"});load()}}
+async function status(id,value,type){await fetch("/admin/api/bookings/"+id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(type==="booking"?{booking_status:value}:{payment_status:value})})}
+load();
+</script></body></html>
